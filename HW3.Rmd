@@ -1,0 +1,51 @@
+---
+title: "HW3"
+author: "Michael Fusco"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Load Libraries
+
+```{r Load Libraries, results = "hide"}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(openintro)
+```
+
+Load Data
+
+```{r Load Data}
+# Load cancer death data
+Data <- read.csv("uscs_map_death_all.csv", header = TRUE)
+Data$State <- Data$State %>%
+  abbr2state() %>%
+  tolower()
+```
+
+Create Map
+
+```{r Create Map}
+# Load map data for states
+Map <- map_data("state")
+
+# Create map
+Map <- Map %>%
+  left_join(y = Data, by = c("region" = "State"))
+  ggplot(data = Map, mapping = aes(x = long, y = lat, group = group, fill = Rate)) +
+  ggtitle("US State Cancer Deaths per 100,000 People") +
+  geom_polygon(color = "black", size = 0.2) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  scale_fill_continuous(type = "viridis") +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        panel.grid = element_blank())
+```
+
